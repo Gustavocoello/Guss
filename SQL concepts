@@ -1,0 +1,674 @@
+SQL
+SQL es un acrónimo de Lenguaje de consulta estructurado (en inglés, Structured Query Language). SQL se utiliza para comunicarse con bases de datos relacionales. 
+Transact SQL
+Las instrucciones SQL básicas, como SELECT,INSERT,UPDATE y DELETE están disponibles independientemente del sistema de base de datos relacional con el que trabaje.
+los lenguajes de programación se pueden clasificar como de procedimientos o declarativos
+Procesamiento basado en conjuntos
+La teoría de conjuntos es una de las bases matemáticas del modelo relacional de administración de datos y es fundamental para trabajar con bases de datos relacionales
+Una característica importante que se debe tener en cuenta sobre la teoría de conjuntos es que no hay ninguna especificación con respecto a ninguna ordenación de los miembros de un conjunto.
+estructura 
+Lenguaje de manipulación de datos (DML), que es el conjunto de instrucciones SQL que se centra en consultar y modificar datos. Las instrucciones DML incluyen SELECT, el punto central de este entrenamiento, y las instrucciones de modificación como INSERT, UPDATE y DELETE.
+Lenguaje de definición de datos (DDL), que es el conjunto de instrucciones SQL que controla la definición y el ciclo de vida de los objetos de base de datos, como tablas, vistas y procedimientos. DDL incluye instrucciones como CREATE, ALTER y DROP.
+Lenguaje de control de datos (DCL), que es el conjunto de instrucciones SQL que se usan para administrar permisos de seguridad paa usuarios y objetos. DCL incluye instrucciones como GRANT, REVOKE y DENY.
+en las instrucciones DML. Normalmente, los analistas de datos usan estas instrucciones para recuperar datos para informes y análisis. 
+T-SQL incluye funciones que le ayudan a convertir explícitamente entre tipos de datos
+CAST y TRY_CAST.
+CONVERT y TRY_CONVERT
+CAST es la función de SQL del estándar ANSI para convertir entre tipos de datos y se usa en muchos sistemas de base de datos. En Transact-SQL, también puede usar la función CONVERT, como se muestra aquí:
+
+SQL
+
+SELECT CONVERT(varchar(4), ProductID) + ': ' + Name AS ProductName
+FROM Production.Product;
+CONVERT también incluye un parámetro que permite especificar un estilo de formato al convertir valores numéricos y de fecha en cadenas.
+
+PARSE y TRY_PARSE
+La función PARSE está diseñada para convertir cadenas con formato que representan valores numéricos o de fecha y hora.
+
+De forma similar a CAST y CONVERT, PARSE tiene una variante TRY_PARSE que devuelve valores incompatibles como NULL. 
+Un valor NULL significa que no hay ningún valor o es desconocido
+STR
+La función STR convierte un valor numérico en varchar.
+
+ISNULL
+La función ISNULL toma dos argumentos. El primero es una expresión que estamos probando. Si el valor de ese primer argumento es NULL, la función devuelve el segundo argumento; 
+Si la primera expresión no es NULL, se devuelve sin cambios. sale el "none" 
+COALESCE es un poco más flexible, ya que puede tomar un número variable de argumentos, cada uno de los cuales es una expresión. Devolverá la primera expresión de la lista que no sea NULL.
+sintaxis
+SELECT COALESCE ( expression1, expression2, [ ,...n ] ) 
+NULLIF
+La función NULLIF permite devolver NULL en determinadas condiciones. Esta función tiene aplicaciones útiles en áreas como la limpieza de datos, cuando desea reemplazar los caracteres en blanco o de marcador de posición por NULL.
+
+Para indicarle a SQL Server que devuelva los resultados de la consulta en un orden determinado, agregue una cláusula ORDER BY con este formato:
+SELECT<select_list>
+FROM <table_source>
+ORDER BY <order_by_list> [ASC|DESC];
+
+TOP es propiedad de T-SQL.
+TOP por sí solo no admite la omisión de filas.
+Como TOP depende de una cláusula ORDER BY, no se puede usar un criterio de ordenación para establecer las filas filtradas por TOP y otra para determinar el orden de salida.
+
+Una extensión de la cláusula ORDER BY denominada OFFSET-FETCH permite devolver solo un intervalo de las filas seleccionadas por la consulta. 
+Sintaxis de OFFSET-FETCH
+OFFSET { integer_constant | offset_row_count_expression } { ROW | ROWS }
+[FETCH { FIRST | NEXT } {integer_constant | fetch_row_count_expression } { ROW | ROWS } ONLY]
+example
+SELECT ProductID, ProductName, ListPrice
+FROM Production.Product
+ORDER BY ListPrice DESC 
+OFFSET 0 ROWS --Skip zero rows
+FETCH NEXT 10 ROWS ONLY; --Get the next 10
+
+Para recuperar la página siguiente de datos del producto, use la cláusula OFFSET para especificar el número de filas que se van a omitir:
+SELECT ProductID, ProductName, ListPrice
+FROM Production.Product
+ORDER BY ListPrice DESC 
+OFFSET 10 ROWS --Skip 10 rows
+FETCH NEXT 10 ROWS ONLY; --Get the next 10
+
+Clausula WHERE 
+olo se devolverán las filas cuando la cláusula WHERE se evalúe como TRUE.
+= (es igual a)
+<> (no es igual a)
+> (mayor que)
+>= (mayor o igual que)
+< (menor que)
+<= (menor o igual que)
+example
+SELECT ProductCategoryID AS Category, ProductName
+FROM Production.Product
+WHERE ListPrice < 10.00;
+
+IS NULL/IS NOT NULL
+También puede filtrar fácilmente para permitir o excluir los valores “unknown” o NULL mediante IS NULL o IS NOT NULL.
+
+Varias condiciones
+Se pueden combinar varios predicados con los operadores AND y OR, y con paréntesis. 
+Sin embargo, SQL Server solo procesará dos condiciones a la vez. Todas las condiciones deben ser TRUE al conectar varias condiciones con el operador AND.
+
+Los operadores AND se procesan antes que los operadores OR, a menos que se utilicen paréntesis. Para el procedimiento recomendado, use paréntesis al usar más de dos predicados. La siguiente consulta devuelve productos de la categoría 2 OR (O) 3 AND (Y) cuesta menos de 10,00:
+
+SQL
+SELECT ProductCategoryID AS Category, ProductName
+FROM Production.Product
+WHERE (ProductCategoryID = 2 OR ProductCategoryID = 3)
+    AND (ListPrice < 10.00);
+
+IN operador de comparacion 
+se puede hacer con OR exapmple
+SELECT ProductCategoryID AS Category, ProductName
+FROM Production.Product
+WHERE ProductCategoryID = 2
+    OR ProductCategoryID = 3
+    OR ProductCategoryID = 4;
+
+Sin embargo, el uso de IN es claro y conciso, y el rendimiento de la consulta no se verá afectado.
+SELECT ProductCategoryID AS Category, ProductName
+FROM Production.Product
+WHERE ProductCategoryID IN (2, 3, 4);
+
+BETWEEN
+SELECT ProductCategoryID AS Category, ProductName
+FROM Production.Product
+WHERE ListPrice BETWEEN 1.00 AND 10.00;
+
+LIKE
+SELECT Name, ListPrice
+FROM SalesLT.Product
+WHERE Name LIKE '%mountain%';
+Puede usar el carácter comodín _ (guión bajo) para representar un carácter único, como este:
+
+SQL
+
+SELECT ProductName, ListPrice
+FROM SalesLT.Product
+WHERE ProductName LIKE 'Mountain Bike Socks, _';
+la siguiente consulta busca productos con un nombre que comience por “Mountain-”, seguido de:
+
+tres caracteres entre 0 y 9
+un espacio
+cualquier cadena
+una coma
+un espacio
+dos caracteres entre 0 y 9
+SELECT ProductName, ListPrice
+FROM SalesLT.Product
+WHERE ProductName LIKE 'Mountain-[0-9][0-9][0-9] %, [0-9][0-9]';
+
+La cláusula FROM y las tablas virtuales
+sintaxis
+
+SELECT p.ProductID, m.Name AS Model, p.Name AS Product
+FROM SalesLT.Product AS p
+JOIN SalesLT.ProductModel AS m
+    ON p.ProductModelID = m.ProductModelID;
+
+Las combinaciones internas se usan para resolver muchos problemas empresariales comunes, especialmente en entornos de base de datos muy normalizados.
+INNER JOIN comienza su fase de procesamiento lógico como un producto cartesiano y después se filtra para quitar las filas que no coinciden con el predicado.
+sintaxis 
+SELECT emp.FirstName, ord.Amount
+FROM HR.Employee AS emp 
+INNER JOIN Sales.SalesOrder AS ord
+    ON emp.EmployeeID = ord.EmployeeID;
+
+    Ejemplos de INNER JOIN
+En el ejemplo hipotético siguiente se realiza una combinación en una sola columna coincidente, lo que relaciona ProductModelID de la tabla Production.Product con ProductModelID de la tabla Production.ProductModel:
+
+SQL
+
+Copiar
+SELECT p.ProductID, m.Name AS Model, p.Name AS Product
+FROM Production.Product AS p
+INNER JOIN Production.ProductModel AS m
+    ON p.ProductModelID = m.ProductModelID
+ORDER BY p.ProductID;
+LEFT OUTER JOIN:
+
+SELECT emp.FirstName, ord.Amount
+FROM HR.Employee AS emp
+LEFT OUTER JOIN Sales.SalesOrder AS ord
+    ON emp.EmployeeID = ord.EmployeeID;
+
+sintaxis de OUTER JOIN
+SELECT emp.FirstName, ord.Amount
+FROM HR.Employee AS emp
+LEFT JOIN Sales.SalesOrder AS ord
+    ON emp.EmployeeID = ord.EmployeeID;
+
+    CROSS JOIN
+SELECT <select_list>
+FROM table1 AS t1
+CROSS JOIN table2 AS t2;
+sintaxis
+SELECT emp.FirstName, prd.Name
+FROM HR.Employee AS emp
+CROSS JOIN Production.Product AS prd;
+
+AUTOCOMBINACIONES 
+SELECT emp.FirstName AS Employee, 
+       mgr.FirstName AS Manager
+FROM HR.Employee AS emp
+LEFT OUTER JOIN HR.Employee AS mgr
+  ON emp.ManagerID = mgr.EmployeeID;
+
+SUBCONSULTAS 
+Una subconsulta es una instrucción SELECT anidada dentro de otra consulta.
+Las subconsultas escalares devuelven un solo valor. Las consultas externas deben procesar un único resultado.
+Las subconsultas multivalor devuelven un resultado muy similar a una tabla de una sola columna. Las consultas externas deben poder procesar varios valores.
+
+Para escribir una subconsulta escalar, tenga en cuenta las siguientes directrices:
+
+Para indicar una consulta como subconsulta, escríbala entre paréntesis.
+Se admiten varios niveles de subconsultas en Transact-SQL. En este módulo, solo se considerarán las consultas de dos niveles (una consulta interna dentro de una consulta externa), pero se admiten hasta 32 niveles.
+Si la subconsulta no devuelve filas (un conjunto vacío), el resultado de la subconsulta es NULL. Si es posible en su escenario que no se devuelva ninguna fila, debe asegurarse de que la consulta externa puede controlar correctamente un valor NULL, además de otros resultados esperados.
+Por lo general, la consulta interna debe devolver una sola columna. La selección de varias columnas en una subconsulta casi siempre es un error. La única excepción es si la subconsulta se indica con la palabra clave EXISTS.
+
+subconsulta escalar comparar la cantidad pedida en el pedido más reciente con la media de todos los pedidos.
+
+
+SELECT SalesOrderID, ProductID, OrderQty,
+    (SELECT AVG(OrderQty)
+     FROM SalesLT.SalesOrderDetail) AS AvgQty
+FROM SalesLT.SalesOrderDetail
+WHERE SalesOrderID = 
+    (SELECT MAX(SalesOrderID)
+     FROM SalesLT.SalesOrderHeader);
+
+SUBCONSULTAS multivalor
+ sintaxis
+ SELECT CustomerID, SalesOrderID
+FROM Sales.SalesOrderHeader
+WHERE CustomerID IN (
+    SELECT CustomerID
+    FROM Sales.Customer
+    WHERE CountryRegion = 'Canada');
+
+    o
+
+    SELECT c.CustomerID, o.SalesOrderID
+FROM Sales.Customer AS c
+JOIN Sales.SalesOrderHeader AS o
+    ON c.CustomerID = o.CustomerID
+WHERE c. CountryRegion = 'Canada';
+
+hay algunas consideraciones especiales cuando se usan subconsultas correlacionadas:
+
+Las subconsultas correlacionadas no se pueden ejecutar por separado desde la consulta externa. Esta restricción complica las pruebas y la depuración.
+A diferencia de las subconsultas independientes, que se procesan una vez, las subconsultas correlacionadas se ejecutarán varias veces. Lógicamente, la consulta externa se ejecuta primero y, para cada fila devuelta, se procesa la consulta interna.
+sintaxis
+SELECT SalesOrderID, CustomerID, OrderDate
+FROM SalesLT.SalesOrderHeader AS o1
+WHERE SalesOrderID =
+    (SELECT MAX(SalesOrderID)
+     FROM SalesLT.SalesOrderHeader AS o2
+     WHERE o2.CustomerID = o1.CustomerID)
+ORDER BY CustomerID, OrderDate;
+
+ejemplo
+SELECT p.ProductID, p.Name, p.StandardCost, p.ListPrice,    
+(SELECT AVG(o.UnitPrice)    
+FROM SalesLT.SalesOrderDetail AS o    
+WHERE p.ProductID = o.ProductID) AS AvgSellingPrice
+FROM SalesLT.Product AS pWHERE StandardCost >    
+    (SELECT AVG(od.UnitPrice)     
+    FROM SalesLT.SalesOrderDetail AS od    
+     WHERE p.ProductID = od.ProductID)
+     ORDER BY p.ProductID;
+
+funciones escalar
+Estas son algunas de las consideraciones que hay que tener en cuenta al usar funciones escalares:
+
+Determinismo: si la función devuelve el mismo valor para el mismo estado de entrada y base de datos cada vez que se llama, se dice que es determinista. Por ejemplo, ROUND(1.1, 0) siempre devuelve el valor 1.0. Muchas funciones integradas son no deterministas. Por ejemplo, GETDATE() devuelve la fecha y hora actuales. Los resultados de las funciones no deterministas no se pueden indexar, lo que afecta a la capacidad del procesador de consultas de idear un buen plan para ejecutar la consulta.
+Intercalación: cuando se usan funciones que manipulan datos de caracteres, ¿qué intercalación se usará? Algunas funciones usan la intercalación (criterio de ordenación) del valor de entrada; otros usan la intercalación de la base de datos si no se proporciona ninguna intercalación de entrada.
+
+En el ejemplo hipotético siguiente se usan varias funciones de fecha y hora:
+
+SQL
+
+Copiar
+SELECT  SalesOrderID,
+    OrderDate,
+        YEAR(OrderDate) AS OrderYear,
+        DATENAME(mm, OrderDate) AS OrderMonth,
+        DAY(OrderDate) AS OrderDay,
+        DATENAME(dw, OrderDate) AS OrderWeekDay,
+        DATEDIFF(yy,OrderDate, GETDATE()) AS YearsSinceOrder
+FROM Sales.SalesOrderHeader;
+
+LOGICAS
+IIF
+SELECT AddressType,
+      IIF(AddressType = 'Main Office', 'Billing', 'Mailing') AS UseAddressFor
+FROM Sales.CustomerAddress;
+
+CHOOSE
+SELECT SalesOrderID, Status,
+CHOOSE(Status, 'Ordered', 'Shipped', 'Delivered') AS OrderStatus
+FROM Sales.SalesOrderHeader;
+
+Category
+SELECT TOP 100 ProductID, Name, ListPrice,
+RANK() OVER(ORDER BY ListPrice DESC) AS RankByPrice
+FROM Production.Product AS p
+ORDER BY RankByPrice;
+
+OVER
+SELECT c.Name AS Category, p.Name AS Product, ListPrice,
+  RANK() OVER(PARTITION BY c.Name ORDER BY ListPrice DESC) AS RankByPrice
+FROM Production.Product AS p
+JOIN Production.ProductCategory AS c
+ON p.ProductCategoryID = c.ProductcategoryID
+ORDER BY Category, RankByPrice;
+
+CONJUNTOS DE filas
+Las funciones OPENDATASOURCE, OPENQUERY y OPENROWSET permiten pasar una consulta a un servidor de bases de datos remoto. A continuación, el servidor remoto devolverá un conjunto de filas de resultados. Por ejemplo, la consulta siguiente usa OPENROWSET para obtener los resultados de una consulta de una instancia de SQL Server llamada SalesDB.
+SELECT a.*
+FROM OPENROWSET('SQLNCLI', 'Server=SalesDB;Trusted_Connection=yes;',
+    'SELECT Name, ListPrice
+    FROM AdventureWorks.Production.Product') AS a;
+
+Al trabajar con funciones de agregado, debe tener en cuenta los siguientes puntos:
+
+Las funciones de agregado devuelven un único valor (escalar) y se pueden usar en instrucciones SELECT casi en cualquier lugar en el que se pueda usar un solo valor. Por ejemplo, estas funciones se pueden usar en las cláusulas SELECT, HAVING y ORDER BY. Sin embargo, no se pueden usar en la cláusula WHERE.
+Las funciones de agregado omiten los valores NULL, excepto cuando se usa COUNT(*).
+Las funciones de agregado de una lista SELECT no tienen un encabezado de columna, a menos que proporcione un alias mediante AS.
+Las funciones de agregado de una lista SELECT funcionan en todas las filas que se pasan a la operación SELECT. Si no hay ninguna cláusula GROUP BY, se resumirán todas las filas que cumplan cualquier filtro de la cláusula WHERE. Obtendrá más información sobre GROUP BY en la unidad siguiente.
+A menos que use GROUP BY, no debe combinar funciones de agregado con columnas no incluidas en las funciones de la misma lista SELECT.
+
+SUM
+
+SUM(expression)
+
+Suma todos los valores numéricos no NULL de una columna.
+
+MEDIA
+
+AVG(expression)
+
+Promedia todos los valores numéricos no NULL de una columna (suma/recuento).
+
+MÍN
+
+MIN(expression)
+
+Devuelve el número más pequeño, la fecha y hora más tempranas o la cadena que se produce por primera vez (según las reglas de ordenación de intercalación).
+
+MÁX
+
+MAX(expression)
+
+Devuelve el número más grande, la fecha y hora más recientes o la última cadena (según las reglas de ordenación de intercalación).
+
+COUNT o COUNT_BIG
+
+COUNT(*) o COUNT(expresión)
+
+Con (*), se cuentan todas las filas, incluidas las filas con valores NULL. Cuando se especifica una columna como expresión, devuelve el recuento de filas que no son NULL para esa columna. COUNT devuelve un valor int; COUNT_BIG devuelve un valor big_int.
+
+SELECT AVG(ListPrice) AS AveragePrice,
+       MIN(ListPrice) AS MinimumPrice,
+       MAX(ListPrice) AS MaximumPrice
+FROM Production.Product;
+
+Esta consulta devuelve la primera y la última empresa por nombre, mediante MIN y MAX:
+
+SELECT MIN(CompanyName) AS MinCustomer, 
+       MAX(CompanyName) AS MaxCustomer
+FROM SalesLT.Customer;
+
+DISTINCT
+
+SELECT COUNT(DISTINCT CustomerID) AS UniqueCustomers
+FROM Sales.SalesOrderHeader;
+
+Hay algunas consideraciones que se deben tener en cuenta:
+
+A excepción de COUNT que se usa con la opción (*), las funciones de agregado de T-SQL omiten los valores NULL. Por ejemplo, una función SUM solo agregará valores que no son NULL. Los valores NULL no se evalúan como cero. COUNT(*) cuenta todas las filas, independientemente del valor o no valor de cualquier columna.
+La presencia de valores NULL en una columna puede dar lugar a cálculos inexactos de AVG, que sumarán solo las filas rellenadas y dividirán esa suma por el número de filas que no son NULL. Puede haber una diferencia en los resultados entre AVG(<columna>) y (SUM(<columna>)/COUNT(*)).
+
+Las cláusulas de una instrucción SELECT se aplican en el orden siguiente:
+
+FROM
+WHERE
+GROUP BY
+HAVING
+SELECT
+ORDER BY
+
+SELECT CustomerID AS Customer,
+       COUNT(*) AS OrderCount
+FROM Sales.SalesOrderHeader
+GROUP BY CustomerID
+ORDER BY Customer;
+
+
+Datos con Nump.py 
+El nd indica que se trata de una estructura que puede constar de múltiples dimensiones. (Puede tener n dimensiones).
+
+Por ejemplo, si falta el número de horas de estudio, podríamos suponer que el estudiante estudió durante una cantidad de tiempo promedio y reemplazar el valor que falta con el promedio de horas de estudio. Para hacer esto, podemos usar el método fillna así:
+df_students.StudyHours = df_students.StudyHours.fillna(df_students.StudyHours.mean())
+df_students
+
+Elimianar filas y columnas de valores nulos
+df_students = df_students.dropna(axis=0, how='any')
+df_students
+
+para ver si aprovo o no
+passes  = pd.Series(df_students['Grade'] >= 60)
+df_students = pd.concat([df_students, passes.rename("Pass")], axis=1)
+
+df_students
+
+Crear tablas simples
+# Ensure plots are displayed inline in the notebook
+%matplotlib inline
+
+from matplotlib import pyplot as plt
+
+# Create a bar plot of name vs grade
+plt.bar(x=df_students.Name, height=df_students.Grade)
+
+# Display the plot
+plt.show()
+
+complejas 
+plt.bar(x=df_students.Name, height=df_students.Grade, color='orange')
+
+# Customize the chart
+plt.title('Student Grades')
+plt.xlabel('Student')
+plt.ylabel('Grade')
+plt.grid(color='#95a5a6', linestyle='--', linewidth=2, axis='y', alpha=0.7)
+plt.xticks(rotation=90)
+
+# Display the plot
+plt.show()
+
+used methods of the Matplotlib.pyplot object to plot charts. and another use is Dateframe
+exapmple
+used methods of the Matplotlib.pyplot object to plot charts.
+
+# Get the variable to examine
+var_data = df_students['Grade']
+
+# Create a Figure
+fig = plt.figure(figsize=(10,4))
+
+# Plot a histogram
+plt.hist(var_data)
+
+# Add titles and labels
+plt.title('Data Distribution')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+
+# Show the figure
+fig.show()
+
+#Let's calculate these values, along with the minimum and maximum values for comparison, and show them on the histogram.
+Get the variable to examine
+var = df_students['Grade']
+
+# Get statistics
+min_val = var.min()
+max_val = var.max()
+mean_val = var.mean()
+med_val = var.median()
+mod_val = var.mode()[0]
+
+print('Minimum:{:.2f}\nMean:{:.2f}\nMedian:{:.2f}\nMode:{:.2f}\nMaximum:{:.2f}\n'.format(min_val,
+                                                                                        mean_val,
+                                                                                        med_val,
+                                                                                        mod_val,
+                                                                                        max_val))
+
+# Create a Figure
+fig = plt.figure(figsize=(10,4))
+
+# Plot a histogram
+plt.hist(var)
+
+# Add lines for the statistics
+plt.axvline(x=min_val, color = 'gray', linestyle='dashed', linewidth = 2)
+plt.axvline(x=mean_val, color = 'cyan', linestyle='dashed', linewidth = 2)
+plt.axvline(x=med_val, color = 'red', linestyle='dashed', linewidth = 2)
+plt.axvline(x=mod_val, color = 'yellow', linestyle='dashed', linewidth = 2)
+plt.axvline(x=max_val, color = 'gray', linestyle='dashed', linewidth = 2)
+
+# Add titles and labels
+plt.title('Data Distribution')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+
+# Show the figure
+fig.show()
+
+df_sales['sales_total'].mean()
+Correcto. Este código devolverá el promedio de los valores de la columna sales_total.
+ 
+Ejemplos del mundo real 
+ guo 
+ import pandas as pd
+from matplotlib import pyplot as plt
+
+# Load data from a text file
+!wget https://raw.githubusercontent.com/MicrosoftDocs/mslearn-introduction-to-machine-learning/main/Data/ml-basics/grades.csv
+df_students = pd.read_csv('grades.csv',delimiter=',',header='infer')
+
+# Remove any rows with missing data
+df_students = df_students.dropna(axis=0, how='any')
+
+# Calculate who passed, assuming '60' is the grade needed to pass
+passes  = pd.Series(df_students['Grade'] >= 60)
+
+# Save who passed to the Pandas dataframe
+df_students = pd.concat([df_students, passes.rename("Pass")], axis=1)
+
+
+# Print the result out into this notebook
+print(df_students)
+
+
+# Create a function that we can re-use
+def show_distribution(var_data):
+    '''
+    This function will make a distribution (graph) and display it
+    '''
+
+    # Get statistics
+    min_val = var_data.min()
+    max_val = var_data.max()
+    mean_val = var_data.mean()
+    med_val = var_data.median()
+    mod_val = var_data.mode()[0]
+
+    print('Minimum:{:.2f}\nMean:{:.2f}\nMedian:{:.2f}\nMode:{:.2f}\nMaximum:{:.2f}\n'.format(min_val,
+                                                                                            mean_val,
+                                                                                            med_val,
+                                                                                            mod_val,
+                                                                                            max_val))
+
+    # Create a figure for 2 subplots (2 rows, 1 column)
+    fig, ax = plt.subplots(2, 1, figsize = (10,4))
+
+    # Plot the histogram   
+    ax[0].hist(var_data)
+    ax[0].set_ylabel('Frequency')
+
+    # Add lines for the mean, median, and mode
+    ax[0].axvline(x=min_val, color = 'gray', linestyle='dashed', linewidth = 2)
+    ax[0].axvline(x=mean_val, color = 'cyan', linestyle='dashed', linewidth = 2)
+    ax[0].axvline(x=med_val, color = 'red', linestyle='dashed', linewidth = 2)
+    ax[0].axvline(x=mod_val, color = 'yellow', linestyle='dashed', linewidth = 2)
+    ax[0].axvline(x=max_val, color = 'gray', linestyle='dashed', linewidth = 2)
+
+    # Plot the boxplot   
+    ax[1].boxplot(var_data, vert=False)
+    ax[1].set_xlabel('Value')
+
+    # Add a title to the Figure
+    fig.suptitle('Data Distribution')
+
+    # Show the figure
+    fig.show()
+
+
+show_distribution(df_students['Grade'])
+
+: You can also eliminate outliers at the upper end of the distribution by defining a threshold at a high percentile value. For example, you could use the quantile function to find the 0.99 percentile below which 99% of the data reside.
+
+his kind of distribution is called right skewed. The mass of the data is on the left side of the distribution, creating a long tail to the right because of the values at the extreme high end, which pull the mean to the right.
+
+Measures of variance
+So now we have a good idea where the middle of the grade and study hours data distributions are. However, there's another aspect of the distributions we should examine: how much variability is there in the data?'
+
+Typical statistics that measure variability in the data include:
+
+Range: The difference between the maximum and minimum. There's no built-in function for this, but it's easy to calculate using the min and max functions.
+Variance: The average of the squared difference from the mean. You can use the built-in var function to find this.
+Standard Deviation: The square root of the variance. You can use the built-in std function to find this.
+
+Comparing data
+df_sample = df_students[df_students['StudyHours']>1]
+df_sample
+
+Comparing numeric and categorical variables
+df_sample.boxplot(column='StudyHours', by='Pass', figsize=(8,5))
+
+Comparing numeric variables
+# Create a bar plot of name vs grade and study hours
+df_sample.plot(x='Name', y=['Grade','StudyHours'], kind='bar', figsize=(8,5))
+Scikit-Learn proporciona un escalador para hacerlo por usted.   
+
+Another way to visualize the apparent correlation between two numeric columns is to use a scatter plot.
+SciPy incluye una clase de estadísticas que proporciona un método linregress para hacer el trabajo duro por usted. 
+
+Using the regression coefficients for prediction
+Define a function based on our regression coefficients
+def f(x):
+    m = 6.3134
+    b = -17.9164
+    return m*x + b
+
+study_time = 14
+
+# Get f(x) for study time
+prediction = f(study_time)
+
+# Grade can't be less than 0 or more than 100
+expected_grade = max(0,min(100,prediction))
+
+#Print the estimated grade
+print ('Studying for {} hours per week may result in a grade of {:.0f}'.format(study_time, expected_grade))
+
+APRENDIZAJE AUTOMATICO
+selección model
+# Load a library to do the hard work for us
+import statsmodels.formula.api as smf
+
+# First, we define our formula using a special syntax
+# This says that boot_size is explained by harness_size
+formula = "boot_size ~ harness_size"
+
+# Create the model, but don't train it yet
+model = smf.ols(formula = formula, data = dataset)
+
+# Note that we have created our model but it does not 
+# have internal parameters set yet
+if not hasattr(model, 'params'):
+    print("Model selected but it does not have parameters set. We need to train it!")
+
+    filtrar datos por Filas
+    Podemos obtener datos de la parte superior de la tabla usando la función head(), o de la parte inferior de la tabla usando la función tail().
+
+    ESTANDARIZACION DE Datos
+    # Add the standardized verions of "age_when_trained" to the dataset.
+# Notice that it "centers" the mean age around 0
+data["standardized_age_when_trained"] = (data.month_old_when_trained - numpy.mean(data.month_old_when_trained)) / (numpy.std(data.month_old_when_trained))
+datos de entrenamiento
+# Print a sample of the new dataset
+data[:5]
+
+from sklearn.model_selection import train_test_split
+
+
+# Obtain the label and feature from the original data
+dataset = data[['rescues_last_year','weight_last_year']]
+
+# Split the dataset in an 70/30 train/test ratio. We also obtain the respective corresponding indices from the original dataset.
+train, test = train_test_split(dataset, train_size=0.7, random_state=21)
+
+print("Train")
+print(train.head())
+print(train.shape)
+
+print("Test")
+print(test.head())
+print(test.shape)
+
+Algoritmo LASSO
+from sklearn.linear_model import Lasso
+
+# Fit a lasso model on the training set
+model = Lasso().fit(X_train, y_train)
+print (model, "\n")
+
+# Evaluate the model using the test data
+predictions = model.predict(X_test)
+mse = mean_squared_error(y_test, predictions)
+print("MSE:", mse)
+rmse = np.sqrt(mse)
+print("RMSE:", rmse)
+r2 = r2_score(y_test, predictions)
+print("R2:", r2)
+
+# Plot predicted vs actual
+plt.scatter(y_test, predictions)
+plt.xlabel('Actual Labels')
+plt.ylabel('Predicted Labels')
+plt.title('Daily Bike Share Predictions')
+# overlay the regression line
+z = np.polyfit(y_test, predictions, 1)
+p = np.poly1d(z)
+plt.plot(y_test,p(y_test), color='magenta')
+plt.show()
